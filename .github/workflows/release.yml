@@ -2,14 +2,22 @@ name: Release
 
 # Builds the CPU, Vulkan and CUDA installers.
 #   - Push a tag like v0.1.0: builds all three and creates a DRAFT GitHub release with the installers.
-#   - Run manually (Actions tab > Release > Run workflow): builds all three and keeps them as workflow
-#     artifacts only. Use this to test the builds without releasing anything.
+#   - Run manually (Actions tab > Release > Run workflow), or open a pull request that changes the release
+#     pipeline: builds all three and keeps them as workflow artifacts only. Nothing is released.
 # The release is created as a draft; nothing is published until you do it yourself.
 
 on:
   push:
     tags: ["v*"]
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/release.yml
+      - scripts/release.ps1
+      - scripts/env.ps1
+      - src-tauri/Cargo.toml
+      - src-tauri/tauri.conf.json
 
 permissions:
   contents: read
