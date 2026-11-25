@@ -12,4 +12,7 @@ Set-Location $script:RepoRoot
 if (-not (Test-Path node_modules)) { npm install --no-fund --no-audit }
 
 Write-Host "Starting Win Whisper dev build: $script:Backend"
-npx tauri dev -- @script:CargoFeatures
+# An array, not "-- @splat": PowerShell does not expand splats after a literal "--".
+$tauriArgs = @('tauri', 'dev')
+if ($script:CargoFeatures.Count -gt 0) { $tauriArgs += @('--') + $script:CargoFeatures }
+& npx.cmd @tauriArgs

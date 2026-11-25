@@ -35,7 +35,11 @@ if ($script:Backend -eq 'cuda') {
 }
 
 try {
-    npx tauri build --config $overrideFile -- @script:CargoFeatures
+    # Build the argument list as an array: PowerShell does not expand @splats that come after a literal "--",
+    # and npx.ps1 would try to evaluate them as an expression. npx.cmd avoids that shim.
+    $tauriArgs = @('tauri', 'build', '--config', $overrideFile)
+    if ($script:CargoFeatures.Count -gt 0) { $tauriArgs += @('--') + $script:CargoFeatures }
+    & npx.cmd @tauriArgs
     if ($LASTEXITCODE -ne 0) { throw "tauri build failed ($LASTEXITCODE)" }
 } finally {
     Remove-Item $overrideFile -ErrorAction SilentlyContinue
