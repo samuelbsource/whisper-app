@@ -58,6 +58,13 @@ jobs:
         with:
           toolchain: stable
 
+      # whisper.cpp's Vulkan shader step nests very deep inside the build folder. With the default
+      # target dir the paths pass Windows' 260 character limit and MSBuild fails (error FTK1011).
+      - name: Use a short build folder
+        if: matrix.backend == 'vulkan'
+        shell: pwsh
+        run: 'Add-Content $env:GITHUB_ENV "CARGO_TARGET_DIR=D:\t"'
+
       - uses: Swatinem/rust-cache@2201cc584a476d1b508be977bbe4b7d1c7a52e9c # v2.9.3
         with:
           workspaces: src-tauri
@@ -72,8 +79,9 @@ jobs:
         uses: Jimver/cuda-toolkit@b8bf9c6c28f8a92fbb04dcfcaee872e60c57462d # v0.2.36
         with:
           cuda: "13.3.1"
+          # Full toolkit: a hand-picked sub-package list missed crt/host_config.h (CUDA 13 moved it).
+          # Slower to install, but reliable. Trim it later once the exact package names are known.
           method: network
-          sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "thrust", "visual_studio_integration"]'
 
       - name: Build the installer
         shell: pwsh

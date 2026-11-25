@@ -47,7 +47,9 @@ try {
 
 # Tauri always names the installer the same; add the backend so the three builds can sit side by side.
 $version = (Get-Content (Join-Path $script:RepoRoot 'src-tauri\tauri.conf.json') -Raw | ConvertFrom-Json).version
-$built = Get-ChildItem (Join-Path $script:RepoRoot 'src-tauri\target\release\bundle\nsis') -Filter *-setup.exe |
+# CARGO_TARGET_DIR relocates the build output (CI uses a short path for the Vulkan build).
+$targetDir = if ($env:CARGO_TARGET_DIR) { $env:CARGO_TARGET_DIR } else { Join-Path $script:RepoRoot 'src-tauri\target' }
+$built = Get-ChildItem (Join-Path $targetDir 'release\bundle\nsis') -Filter *-setup.exe |
     Sort-Object LastWriteTime -Descending | Select-Object -First 1
 if (-not $built) { throw 'No installer was produced.' }
 $outDir = Join-Path $script:RepoRoot 'installers'
