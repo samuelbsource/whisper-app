@@ -26,9 +26,9 @@ the same app. They differ only in how the speech model is run.
 
 | Your computer | Installer | Notes |
 |---|---|---|
-| **NVIDIA graphics card**: GeForce GTX 16-series, RTX 20, 30, 40 or 50 | **CUDA** | Fastest option, but a big download (about 430 MB) because it includes NVIDIA's own libraries. |
-| **AMD Radeon**, **Intel Arc / Iris**, or an **older NVIDIA card** (GTX 10-series and older) | **Vulkan** | Uses your GPU through the standard Vulkan driver. Small download. |
-| **No dedicated graphics card**, an old PC, or you're **not sure** | **CPU** | Works on every Windows 10/11 PC. Slower, so pair it with a small model (base or small). |
+| **NVIDIA graphics card**: GeForce GTX 16-series, RTX 20, 30, 40 or 50 | **CUDA** | Fastest option, but a big download (about 500 MB) because it includes NVIDIA's own libraries. |
+| **AMD Radeon**, **Intel Arc / Iris**, or an **older NVIDIA card** (GTX 10-series and older) | **Vulkan** | Uses your GPU through the standard Vulkan driver. Small download (under 10 MB). |
+| **No dedicated graphics card**, an old PC, or you're **not sure** | **CPU** | Works on every Windows 10/11 PC. Small download (under 10 MB). Slower, so pair it with a small model (base or small). |
 
 How to check your graphics card: press `Ctrl+Shift+Esc`, open **Performance**, and look at **GPU** in the
 left-hand list.
