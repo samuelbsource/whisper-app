@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check (Windows, CPU build)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    env:
+      # LLVM and CMake come preinstalled on the Windows runner image.
+      LIBCLANG_PATH: C:\Program Files\LLVM\bin
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@2201cc584a476d1b508be977bbe4b7d1c7a52e9c # v2.9.3
+        with:
+          workspaces: src-tauri
+
+      - name: Install npm packages
+        run: npm ci --no-fund --no-audit
+
+      - name: Type-check the UI
+        run: npm run check
+
+      - name: Build the UI
+        run: npm run build
+
+      - name: Fetch Rust dependencies
+        run: cargo fetch --locked
+        working-directory: src-tauri
+
+      - name: Third-party notices are up to date
+        run: node scripts/notices.mjs --check
+
+      - name: rustfmt
+        run: cargo fmt --check
+        working-directory: src-tauri
+
+      - name: clippy
+        run: cargo clippy --locked --all-targets -- -D warnings
+        working-directory: src-tauri
+
+      - name: Unit tests
+        run: cargo test --locked --lib
+        working-directory: src-tauri

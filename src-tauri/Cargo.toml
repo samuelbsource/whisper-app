@@ -1,0 +1,58 @@
+[package]
+name = "win-whisper"
+version = "0.1.0"
+description = "Whisper dictation and transcription for Windows"
+edition = "2024"
+rust-version = "1.88"
+license = "MIT"
+authors = ["Samuel Boczek"]
+repository = "https://github.com/samuelbsource/whisper-app"
+
+[lib]
+name = "win_whisper_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }
+
+[dependencies]
+tauri = { version = "2.12", features = ["tray-icon", "image-png"] }
+tauri-plugin-global-shortcut = "2.4"
+tauri-plugin-single-instance = "2.5"
+tauri-plugin-dialog = "2.8"
+tauri-plugin-autostart = "2.7"
+tauri-plugin-opener = "2.7"
+tauri-plugin-log = "2.10"
+log = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+whisper-rs = { version = "0.16", features = ["log_backend"] }
+cpal = "0.18"
+arboard = "3.7"
+reqwest = { version = "0.13", features = ["stream", "json"] }
+futures-util = "0.3"
+sha2 = "0.11"
+uuid = { version = "1", features = ["v4"] }
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[features]
+default = []
+# GPU backends for whisper.cpp. `cuda` needs the CUDA Toolkit, `vulkan` the Vulkan SDK.
+cuda = ["whisper-rs/cuda"]
+vulkan = ["whisper-rs/vulkan"]
+
+# whisper.cpp is unusably slow when compiled without optimisations,
+# so build it optimised even in dev builds.
+[profile.dev.package.whisper-rs-sys]
+opt-level = 3
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
