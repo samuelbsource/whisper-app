@@ -25,12 +25,20 @@ permissions:
 jobs:
   build:
     name: Build (${{ matrix.backend }})
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 150
     strategy:
       fail-fast: false
       matrix:
-        backend: [cpu, vulkan, cuda]
+        include:
+          - backend: cpu
+            os: windows-latest
+          - backend: vulkan
+            os: windows-latest
+          # windows-latest ships Visual Studio 2026 (MSVC 14.5x), which CUDA 13 does not support: nvcc's
+          # cudafe++ crashes with an access violation. The VS 2022 image works, like a local VS 2022 build.
+          - backend: cuda
+            os: windows-2022
     env:
       LIBCLANG_PATH: C:\Program Files\LLVM\bin
     steps:
